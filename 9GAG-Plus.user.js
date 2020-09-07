@@ -27,8 +27,8 @@ document.addEventListener("scroll", function() {
     $('.length').remove();
     $("article:nth-of-type(2)").remove();
     $("article:nth-of-type(4)").remove();
-        var DNA = document.getElementsByTagName('video');
-	for( var i = 0; i < DNA.length; i++ ){
+    var DNA = document.getElementsByTagName('video');
+	for( var i = 0; i <= DNA.length; i++ ){
         var eDNA = DNA.item(i);
         eDNA.setAttribute("controls", "");
         eDNA.volume = 1;
