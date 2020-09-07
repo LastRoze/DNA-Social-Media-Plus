@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name	DNA 9GAG Plus
 // @namespace   DNA 9GAG Plus
-// @version	1.0
+// @version	1.1
 // @author	Last Roze
 // @description	Dominion With Domination
 // @copyright	©2020 - Yoga Budiman
