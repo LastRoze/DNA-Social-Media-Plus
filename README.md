@@ -1,2 +1,2 @@
-# 9GAG-Plus
-Make your 9GAG browsing experience better.
+# DNA Social Media Plus
+Make your social browsing experience better.
