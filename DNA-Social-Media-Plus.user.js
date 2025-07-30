@@ -42,13 +42,6 @@
 
     function defaultHandler(video) {video.controls = true;video.volume = 1;video.muted = true;}
 
-    function setupEnhancer() {
-        enhanceVideos();
-        let scrollTimeout;
-        $(window).on('scroll', function () {clearTimeout(scrollTimeout);scrollTimeout = setTimeout(enhanceVideos, 300);});
-        const observer = new MutationObserver(function (mutations) {
-            for (const mutation of mutations) {if (mutation.addedNodes.length) {enhanceVideos();break;}}});
-        observer.observe(document.body, { childList: true, subtree: true });
-    }
+    function setupEnhancer() {enhanceVideos();let scrollTimeout;$(window).on('scroll', function () {clearTimeout(scrollTimeout);scrollTimeout = setTimeout(enhanceVideos, 300);});const observer = new MutationObserver(function (mutations) {for (const mutation of mutations) {if (mutation.addedNodes.length) {enhanceVideos();break;}}});observer.observe(document.body, { childList: true, subtree: true });}
     $(document).ready(setupEnhancer);
 })();
