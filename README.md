@@ -58,9 +58,7 @@ Social feeds wrap every video in their own player. The site decides when sound p
 
 Updates are automatic. The manager polls [`DNA-Social-Media-Plus.meta.js`](DNA-Social-Media-Plus.meta.js) and pulls the new script when `@version` goes up.
 
-> **Coming from v1.0?** It pointed its update check at files that no longer existed, so it never updated. Version 1.1 publishes those old paths again, so the next update check moves you onto this script.
->
-> **Coming from the old "DNA 9GAG Plus" (2.0)?** That script's version line is higher than this one, so it will not update by itself. Install from the link above and remove the old entry.
+> **Upgrading from v1.0?** Its update check pointed at a file that no longer exists, so it cannot update itself. Install from the link above once; from then on updates are automatic.
 
 ## Supported sites
 
@@ -176,11 +174,11 @@ Open an issue with a link to a public page that shows the problem. Each site is 
 DNA-Social-Media-Plus/
 |-- DNA-Social-Media-Plus.user.js   the script (edit this one)
 |-- DNA-Social-Media-Plus.meta.js   generated: metadata block for update checks
-|-- 9GAG-Plus.user.js               generated: copy for installs from the 9GAG Plus era
-|-- 9GAG-Plus.meta.js               generated: copy for installs from the 9GAG Plus era
-|-- scripts/build.mjs               writes the generated files, --check verifies them
+|-- DNA.jpg                         icon
+|-- LESSONS.md                      rules learned the hard way
+|-- scripts/build.mjs               writes the .meta.js file and checks @version, --check verifies it
 |-- scripts/text-lint.ts            text hygiene lint for PR titles and bodies
-`-- .github/workflows/checks.yml    CI: syntax, generated files, PR text hygiene
+`-- .github/workflows/checks.yml    CI: syntax, version format, .meta.js freshness, PR text hygiene
 ```
 
 ### Add a site
@@ -198,8 +196,8 @@ Then add a matching `// @match` line to the header.
 ### Release
 
 1. Edit `DNA-Social-Media-Plus.user.js` and raise `@version` by one step: `1.1`, `1.2` ... `1.9`, then `2.0`, `2.1` and so on. The format is always `MAJOR.MINOR` with a single-digit minor; `node scripts/build.mjs --check` rejects anything else.
-2. Run `node scripts/build.mjs` to regenerate the `.meta.js` file and the legacy copies.
-3. Open a pull request. CI checks the syntax, checks that the generated files are current, and lints the PR title and body.
+2. Run `node scripts/build.mjs` to regenerate the `.meta.js` file.
+3. Open a pull request. CI checks the syntax, the version format and that the `.meta.js` file is current, and lints the PR title and body.
 4. Merge to `master`. Installed copies update on their next check.
 
 ## Changelog
@@ -208,7 +206,6 @@ Then add a matching `// @match` line to the header.
 | :-- | :-- |
 | **1.1** | Added NSFW.com. Fixed the 9GAG "Play" badge, length label and sound toggle coming back after re-renders. Fixed clicks on 9GAG videos opening the post in a new tab, and clicks on NSFW.com videos opening the viewer. Fixed Instagram, where an invisible layer covered the controls. Stopped sites from re-muting a clip after the user unmuted it. Fixed update checks that pointed at deleted files. Removed jQuery, the scroll handler and the `MutationObserver`. Started at `document-start`. |
 | 1.0 | First DNA Social Media Plus release: 9GAG and Instagram. |
-| 2.0 (DNA 9GAG Plus) | Last release of the old 9GAG-only script, on its own version line. |
 
 ## Credits
 

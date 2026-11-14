@@ -20,7 +20,7 @@ jobs:
           node-version: 22
       - name: Syntax
         run: node --check DNA-Social-Media-Plus.user.js
-      - name: Generated files match the script
+      - name: Version format and .meta.js freshness
         run: node scripts/build.mjs --check
 
   text-hygiene:
