@@ -11,6 +11,9 @@ const end = script.indexOf(END);
 if (!script.startsWith('// ==UserScript==') || end === -1) throw new Error(`${SOURCE} has no metadata block`);
 const meta = script.slice(0, end + END.length) + '\n';
 
+const version = (meta.match(/^\/\/ @version\s+(\S+)$/m) || [])[1];
+if (!/^\d+\.\d$/.test(version || '')) throw new Error(`@version must be MAJOR.MINOR with one minor digit (1.1 ... 1.9, 2.0), got ${version}`);
+
 const outputs = { 'DNA-Social-Media-Plus.meta.js': meta };
 for (const [file, kind] of Object.entries(LEGACY)) outputs[file] = kind === 'meta' ? meta : script;
 
