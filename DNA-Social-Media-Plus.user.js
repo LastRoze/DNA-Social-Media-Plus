@@ -1,47 +1,124 @@
 // ==UserScript==
 // @name        DNA Social Media Plus
 // @namespace   DNA Social Media Plus
-// @version     1.0
+// @version     3.0.0
 // @author      Last Roze
-// @description Dominion With Domination
-// @copyright   ©2020 - 2025 Yoga Budiman
-// @homepage    https://github.com/LastRoze/
-// @homepageURL https://github.com/LastRoze/
+// @description Replaces the custom video overlays on 9GAG, NSFW.com and Instagram with native browser controls: play, seek, time, volume, speed and fullscreen.
+// @copyright   Copyright (c) 2020 - 2026 Yoga Budiman
+// @homepage    https://github.com/LastRoze/DNA-Social-Media-Plus
+// @homepageURL https://github.com/LastRoze/DNA-Social-Media-Plus
 // @website     https://lastroze.github.io/
 // @source      https://github.com/LastRoze/DNA-Social-Media-Plus
-// @icon        https://github.com/LastRoze/DNA-Social-Media-Plus/blob/master/DNA.jpg?raw=true
-// @iconURL     https://github.com/LastRoze/DNA-Social-Media-Plus/blob/master/DNA.jpg?raw=true
-// @defaulticon https://github.com/LastRoze/DNA-Social-Media-Plus/blob/master/DNA.jpg?raw=true
-// @icon64      https://github.com/LastRoze/DNA-Social-Media-Plus/blob/master/DNA.jpg?raw=true
-// @icon64URL   https://github.com/LastRoze/DNA-Social-Media-Plus/blob/master/DNA.jpg?raw=true
-// @updateURL   https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/9GAG-Plus.meta.js
-// @downloadURL https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/9GAG-Plus.user.js
-// @supportURL  https://lastroze.github.io/
-// @require     https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js
+// @icon        https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA.jpg
+// @iconURL     https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA.jpg
+// @defaulticon https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA.jpg
+// @icon64      https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA.jpg
+// @icon64URL   https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA.jpg
+// @updateURL   https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA-Social-Media-Plus.meta.js
+// @downloadURL https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA-Social-Media-Plus.user.js
+// @supportURL  https://github.com/LastRoze/DNA-Social-Media-Plus/issues
 // @match       *://*.9gag.com/*
+// @match       *://*.nsfw.com/*
 // @match       *://*.instagram.com/*
-// @run-at      document-end
+// @run-at      document-start
+// @noframes
 // @grant       none
 // ==/UserScript==
-/* global $, jQuery */
 
 (function () {
-    'use strict';
-    const SITE_HANDLERS = {
-        '9gag.com': handle9GAG,
-        'instagram.com': handleInstagram
-    };
+	'use strict';
 
-    function enhanceVideos() {const hostname = window.location.hostname;const handler = getHandlerForHost(hostname);$('video').each(function () {const video = this;if (video.hasAttribute('data-dna-enhanced')) return;handler(video);video.setAttribute('data-dna-enhanced', 'true');});}
+	const SITES = [
+		{
+			host: /(^|\.)9gag\.com$/,
+			css: '.video-post .sound-toggle, .video-post .length, .video-post .play { display: none !important; }'
+		},
+		{
+			host: /(^|\.)nsfw\.com$/,
+			css: '.media-frame > button[aria-label="View media"], .media-frame > button[aria-label="Unmute"], .media-frame > button[aria-label="Mute"] { display: none !important; }'
+				+ ' .media-frame > video { cursor: auto; }'
+		},
+		{
+			host: /(^|\.)instagram\.com$/,
+			css: '',
+			overlay: (video) => {
+				const box = video.getBoundingClientRect();
+				const x = box.left + box.width / 2;
+				const y = box.top + box.height / 2;
+				for (let node = video.parentElement, depth = 0; node && depth < 12; node = node.parentElement, depth++) {
+					const group = node.nextElementSibling && node.nextElementSibling.querySelector('[role="group"]');
+					if (!group || !group.querySelector(':scope > [role="presentation"]')) continue;
+					const cover = group.getBoundingClientRect();
+					return x >= cover.left && x <= cover.right && y >= cover.top && y <= cover.bottom ? group : null;
+				}
+				return null;
+			}
+		}
+	];
 
-    function getHandlerForHost(hostname) {for (const domain in SITE_HANDLERS) {if (hostname.includes(domain)) {return SITE_HANDLERS[domain];}}return defaultHandler;}
+	const site = SITES.find((entry) => entry.host.test(location.hostname));
+	if (!site) return;
 
-    function handle9GAG(video) {$('.off.sound-toggle, .length, .play').remove();defaultHandler(video);}
+	const style = document.createElement('style');
+	style.textContent = site.css + ' [data-dna-overlay] { display: none !important; }';
+	if (document.documentElement) document.documentElement.appendChild(style);
+	else new MutationObserver((_, observer) => {
+		if (!document.documentElement) return;
+		observer.disconnect();
+		document.documentElement.appendChild(style);
+	}).observe(document, { childList: true });
 
-    function handleInstagram(video) {defaultHandler(video);video.style.position = 'absolute';video.style.zIndex = '1000';const originalPlay = video.play;video.play = function () {this.muted = false;return originalPlay.apply(this, arguments);};}
+	const upgrade = (video, newSource) => {
+		if (video.controls && !newSource) return;
+		video.controls = true;
+		const overlay = site.overlay && site.overlay(video);
+		if (overlay) overlay.setAttribute('data-dna-overlay', '');
+	};
 
-    function defaultHandler(video) {video.controls = true;video.volume = 1;video.muted = true;}
+	const enable = (event) => {
+		if (event.target instanceof HTMLVideoElement) upgrade(event.target, event.type === 'loadstart');
+	};
 
-    function setupEnhancer() {enhanceVideos();let scrollTimeout;$(window).on('scroll', function () {clearTimeout(scrollTimeout);scrollTimeout = setTimeout(enhanceVideos, 300);});const observer = new MutationObserver(function (mutations) {for (const mutation of mutations) {if (mutation.addedNodes.length) {enhanceVideos();break;}}});observer.observe(document.body, { childList: true, subtree: true });}
-    $(document).ready(setupEnhancer);
+	const isolate = (event) => {
+		const video = event.target;
+		if (!(video instanceof HTMLVideoElement) || !video.controls) return;
+		event.stopPropagation();
+		const link = video.closest('a[href]');
+		if (!link) return;
+		const href = link.getAttribute('href');
+		link.removeAttribute('href');
+		setTimeout(() => link.setAttribute('href', href));
+	};
+
+	const userSound = new WeakSet();
+	const scriptSound = new WeakMap();
+
+	for (const key of ['muted', 'volume']) {
+		const native = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, key);
+		Object.defineProperty(HTMLMediaElement.prototype, key, {
+			...native,
+			set(value) {
+				if (userSound.has(this)) return;
+				native.set.call(this, value);
+				scriptSound.set(this, { muted: this.muted, volume: this.volume });
+			}
+		});
+	}
+
+	const keepSound = (event) => {
+		const video = event.target;
+		if (!(video instanceof HTMLVideoElement) || !video.controls || userSound.has(video)) return;
+		const expected = scriptSound.get(video) || { muted: video.defaultMuted, volume: 1 };
+		if (video.muted !== expected.muted || video.volume !== expected.volume) userSound.add(video);
+	};
+
+	for (const type of ['loadstart', 'loadedmetadata', 'play']) document.addEventListener(type, enable, true);
+	document.addEventListener('volumechange', keepSound, true);
+	for (const type of ['click', 'dblclick']) window.addEventListener(type, isolate, true);
+
+	const sweep = () => {
+		for (const video of document.getElementsByTagName('video')) upgrade(video, false);
+	};
+	if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', sweep, { once: true });
+	else sweep();
 })();
