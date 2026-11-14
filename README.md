@@ -8,7 +8,7 @@
 
 A userscript that removes the custom video overlays on 9GAG, NSFW.com and Instagram and gives every clip the browser's own player: play, pause, seek, elapsed time, volume, playback speed, picture-in-picture and fullscreen.
 
-[![Version](https://img.shields.io/badge/version-3.0.0-7c3aed?style=for-the-badge)](https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA-Social-Media-Plus.user.js)
+[![Version](https://img.shields.io/badge/version-1.1-7c3aed?style=for-the-badge)](https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA-Social-Media-Plus.user.js)
 [![Install](https://img.shields.io/badge/install-userscript-16a34a?style=for-the-badge&logo=tampermonkey&logoColor=white)](https://github.com/LastRoze/DNA-Social-Media-Plus/raw/master/DNA-Social-Media-Plus.user.js)
 [![Size](https://img.shields.io/badge/size-under%205%20KB-0ea5e9?style=for-the-badge)](DNA-Social-Media-Plus.user.js)
 [![Dependencies](https://img.shields.io/badge/dependencies-none-f59e0b?style=for-the-badge)](DNA-Social-Media-Plus.user.js)
@@ -58,7 +58,9 @@ Social feeds wrap every video in their own player. The site decides when sound p
 
 Updates are automatic. The manager polls [`DNA-Social-Media-Plus.meta.js`](DNA-Social-Media-Plus.meta.js) and pulls the new script when `@version` goes up.
 
-> **Coming from v1.0 or the old "DNA 9GAG Plus"?** Those versions pointed their update check at files that no longer existed, so they never updated. Version 3.0.0 publishes those old paths again, so the next update check moves you onto this script. To skip the wait, install from the link above and remove the old entry.
+> **Coming from v1.0?** It pointed its update check at files that no longer existed, so it never updated. Version 1.1 publishes those old paths again, so the next update check moves you onto this script.
+>
+> **Coming from the old "DNA 9GAG Plus" (2.0)?** That script's version line is higher than this one, so it will not update by itself. Install from the link above and remove the old entry.
 
 ## Supported sites
 
@@ -108,7 +110,7 @@ flowchart LR
 
 ## Performance
 
-| Concern | v1.0 | v3.0.0 |
+| Concern | v1.0 | v1.1 |
 | :-- | :-- | :-- |
 | Script size | 2.9 KB plus jQuery 3.1.1 (about 85 KB) from a Google CDN | 4.8 KB, no `@require` |
 | Network requests at page load | 1 (jQuery) | 0 |
@@ -195,7 +197,7 @@ Then add a matching `// @match` line to the header.
 
 ### Release
 
-1. Edit `DNA-Social-Media-Plus.user.js` and raise `@version`.
+1. Edit `DNA-Social-Media-Plus.user.js` and raise `@version` by one step: `1.1`, `1.2` ... `1.9`, then `2.0`, `2.1` and so on. The format is always `MAJOR.MINOR` with a single-digit minor; `node scripts/build.mjs --check` rejects anything else.
 2. Run `node scripts/build.mjs` to regenerate the `.meta.js` file and the legacy copies.
 3. Open a pull request. CI checks the syntax, checks that the generated files are current, and lints the PR title and body.
 4. Merge to `master`. Installed copies update on their next check.
@@ -204,9 +206,9 @@ Then add a matching `// @match` line to the header.
 
 | Version | Changes |
 | :-- | :-- |
-| **3.0.0** | Added NSFW.com. Fixed the 9GAG "Play" badge, length label and sound toggle coming back after re-renders. Fixed clicks on 9GAG videos opening the post in a new tab, and clicks on NSFW.com videos opening the viewer. Fixed Instagram, where an invisible layer covered the controls. Stopped sites from re-muting a clip after the user unmuted it. Fixed update checks that pointed at deleted files. Removed jQuery, the scroll handler and the `MutationObserver`. Started at `document-start`. |
+| **1.1** | Added NSFW.com. Fixed the 9GAG "Play" badge, length label and sound toggle coming back after re-renders. Fixed clicks on 9GAG videos opening the post in a new tab, and clicks on NSFW.com videos opening the viewer. Fixed Instagram, where an invisible layer covered the controls. Stopped sites from re-muting a clip after the user unmuted it. Fixed update checks that pointed at deleted files. Removed jQuery, the scroll handler and the `MutationObserver`. Started at `document-start`. |
 | 1.0 | First DNA Social Media Plus release: 9GAG and Instagram. |
-| 2.0 (DNA 9GAG Plus) | Last release under the old 9GAG-only name. |
+| 2.0 (DNA 9GAG Plus) | Last release of the old 9GAG-only script, on its own version line. |
 
 ## Credits
 

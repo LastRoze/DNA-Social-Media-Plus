@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DNA Social Media Plus
 // @namespace   DNA Social Media Plus
-// @version     3.0.0
+// @version     1.1
 // @author      Last Roze
 // @description Replaces the custom video overlays on 9GAG, NSFW.com and Instagram with native browser controls: play, seek, time, volume, speed and fullscreen.
 // @copyright   Copyright (c) 2020 - 2026 Yoga Budiman
