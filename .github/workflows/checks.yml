@@ -1,0 +1,39 @@
+name: Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  userscript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Syntax
+        run: node --check DNA-Social-Media-Plus.user.js
+      - name: Generated files match the script
+        run: node scripts/build.mjs --check
+
+  text-hygiene:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Lint PR title and body
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json title --jq .title > "$RUNNER_TEMP/pr-title.md"
+          gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json body --jq '.body // ""' > "$RUNNER_TEMP/pr-body.md"
+          bun scripts/text-lint.ts "$RUNNER_TEMP/pr-title.md" "$RUNNER_TEMP/pr-body.md"
